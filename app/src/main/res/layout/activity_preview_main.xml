@@ -5,9 +5,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <ListView
+    <!--The playlist view of the songs-->
+    <LinearLayout
         android:layout_width="368dp"
-        android:layout_height="425dp"
+        android:layout_height="419dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
@@ -17,7 +18,12 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0">
+        <include
+            layout="@layout/playlist"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,20 +49,22 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!--The song title-->
             <TextView
-                android:id="@+id/textView_song"
+                android:id="@+id/textView_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:text="TextView"
-                android:textSize="20sp"
-                android:onClick="onClickSong"/>
+                android:onClick="onClickSong"
+                android:text="Title"
+                android:textSize="20sp" />
 
+            <!--The song artist-->
             <TextView
                 android:id="@+id/textView_artist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="Artist" />
         </LinearLayout>
 
         <LinearLayout
@@ -67,10 +75,11 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
+                <!-- previous button-->
                 <ImageButton
                     android:id="@+id/button_prev"
                     android:layout_width="match_parent"
@@ -79,14 +88,17 @@
                     android:background="@color/transparent"
                     android:src="@drawable/ic_previous" />
 
+                <!-- Play/pause button-->
                 <ImageButton
                     android:id="@+id/button_play"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="@drawable/ic_play"
-                    android:onClick="onPlayPause" />
+                    android:background="@color/transparent"
+                    android:onClick="onPlayPause"
+                    android:src="@drawable/ic_play" />
 
+                <!-- Next button-->
                 <ImageButton
                     android:id="@+id/button_next"
                     android:layout_width="match_parent"

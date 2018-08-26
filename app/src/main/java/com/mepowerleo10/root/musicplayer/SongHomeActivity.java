@@ -1,8 +1,9 @@
 package com.mepowerleo10.root.musicplayer;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageButton;
 
 /**
  *TODO:Set the songs image as the default imageView in this screen
@@ -10,12 +11,16 @@ import android.view.View;
 
 public class SongHomeActivity extends AppCompatActivity {
 
+    ImageButton play_pause;
     int num = 0;
     public  void onPlayPause(View view) {
-        if(num % 2 == 0)
-            view.setBackgroundResource(R.drawable.ic_pause);
+
+        play_pause = findViewById(R.id.button_play);
+        if(num % 2 == 0) {
+            play_pause.setImageResource(R.drawable.ic_pause);
+        }
         else
-            view.setBackgroundResource(R.drawable.ic_play);
+            play_pause.setImageResource(R.drawable.ic_play);
         num++;
     }
 

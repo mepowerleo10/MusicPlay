@@ -20,13 +20,18 @@ import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    MediaPlayer mp;
 
+    ImageButton play_pause;
     int num = 0;
     public  void onPlayPause(View view) {
-        if(num % 2 == 0)
-            view.setBackgroundResource(R.drawable.ic_pause);
+
+        play_pause = (ImageButton)findViewById(R.id.button_play);
+        if(num % 2 == 0) {
+            play_pause.setImageResource(R.drawable.ic_pause);
+        }
         else
-            view.setBackgroundResource(R.drawable.ic_play);
+            play_pause.setImageResource(R.drawable.ic_play);
         num++;
     }
     @Override
@@ -50,7 +55,7 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else { 
+        } else {
             super.onBackPressed();
         }
     }
