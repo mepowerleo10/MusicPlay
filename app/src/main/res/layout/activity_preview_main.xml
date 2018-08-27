@@ -45,7 +45,7 @@
         tools:ignore="UnknownId">
 
         <LinearLayout
-            android:layout_width="166dp"
+            android:layout_width="202dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
@@ -59,15 +59,15 @@
                 android:onClick="onClickSong"
                 android:text="Title"
                 android:textColor="@android:color/background_dark"
-                android:textSize="20sp" />
+                android:textSize="18sp" />
 
             <!--The song artist-->
             <TextView
                 android:id="@+id/textView_artist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Artist"
                 android:onClick="onClickSong"
+                android:text="Artist"
                 android:textColor="@android:color/background_dark" />
         </LinearLayout>
 
@@ -90,15 +90,17 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@color/transparent"
+                    android:onClick="onClick"
                     android:src="@drawable/ic_previous" />
 
                 <!-- Play/pause button-->
                 <ImageButton
                     android:id="@+id/button_play"
-                    android:layout_width="match_parent"
+                    android:layout_width="217dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@color/transparent"
+                    android:onClick="onClick"
                     android:src="@drawable/ic_play" />
 
                 <!-- Next button-->
@@ -108,6 +110,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@color/transparent"
+                    android:onClick="onClick"
                     android:src="@drawable/ic_skip" />
 
             </LinearLayout>

@@ -1,6 +1,8 @@
 package com.mepowerleo10.root.musicplayer;
 
 import android.content.Intent;
+import android.media.MediaMetadata;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,22 +38,10 @@ public class MainActivity extends AppCompatActivity
     int pos = 0;
     MediaPlayer mediaPlayer;
     Uri uri;
+    Intent intent;
+    MediaMetadataRetriever mediaInfo;
+    TextView artist, song;
 
-    public  void onPlayPause() {
-        if(mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
-            mediaPlayer.start();
-            play_pause.setImageResource(R.drawable.ic_pause);
-        }
-        if(!mediaPlayer.isPlaying()) {
-            mediaPlayer.start();
-            play_pause.setImageResource(R.drawable.ic_pause);
-        }
-        else {
-            mediaPlayer.pause();
-            play_pause.setImageResource(R.drawable.ic_play);
-        }
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +57,9 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        song = findViewById(R.id.textView_title);
+        artist = findViewById(R.id.textView_artist);
+
         //fetch all song from the sdcard
         SongManager manager = new SongManager();
         songsList = manager.getList(Environment.getExternalStorageDirectory());
@@ -76,6 +70,8 @@ public class MainActivity extends AppCompatActivity
             musicList[i] = songsList.get(i).getName().toString().replace(".mp3","");
         }
 
+        mediaInfo = new MediaMetadataRetriever();
+        uri = Uri.parse(songsList.get(pos).toString());
         //Populate the listview
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.playlist, R.id.song_view, musicList);
         playlist = findViewById(R.id.play_list);
@@ -90,6 +86,15 @@ public class MainActivity extends AppCompatActivity
 
                 //Parse the item's location to a URI
                 uri = Uri.parse(songsList.get(position).toString());
+                try {
+
+                    mediaInfo.setDataSource(songsList.get(position).getPath());
+                    song.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+                    artist.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+                } catch (Exception e) {
+                    song.setText(songsList.get(position).getName().toString());
+                    artist.setText("Unknown Artist");
+                }
                 if(mediaPlayer == null) {
                     //The player has come from a destroyed process
                     mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
@@ -97,12 +102,13 @@ public class MainActivity extends AppCompatActivity
                     play_pause.setImageResource(R.drawable.ic_pause);
                 } else if(!mediaPlayer.isPlaying()) {
                     //The player was paused
+                    mediaPlayer.reset();
                     mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                     mediaPlayer.start();
                     play_pause.setImageResource(R.drawable.ic_pause);
                 } else {
                     //Another song on the listview has been selected, stop the previous one
-                    mediaPlayer.stop();
+                    mediaPlayer.reset();
                     mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                     mediaPlayer.start();
                 }
@@ -162,33 +168,91 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    /**
+    /*
      *clicking the playing song's name on this screen leads to the SongHomeActivity
-     */
+     **/
     public void onClickSong(View view) {
         //Bundling together all information from this context
-        startActivity(new Intent(getApplicationContext(),SongHomeActivity.class)
-                    .putExtra("pos", pos).putExtra("songList", songsList));
+        intent = new Intent(getApplicationContext(),SongHomeActivity.class)
+                .putExtra("pos", pos).putExtra("songList", songsList)
+                .putExtra("cur_pos", mediaPlayer.getCurrentPosition())
+                .putExtra("is_playing",mediaPlayer.isPlaying());
+        mediaPlayer.release();
+        startActivity(intent);
     }
 
+    public  void onPlayPause() {
+        if(mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
+            mediaPlayer.start();
+            play_pause.setImageResource(R.drawable.ic_pause);
+        }
+        if(!mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
+            play_pause.setImageResource(R.drawable.ic_pause);
+        }
+        else {
+            mediaPlayer.pause();
+            play_pause.setImageResource(R.drawable.ic_play);
+        }
+    }
+
+    /*
+    * @param v(View)
+    * */
     @Override
     public void onClick(View v) {
         int id = v.getId();
         switch (id)
         {
             case R.id.button_play:
+                try {
+
+                    mediaInfo.setDataSource(songsList.get(pos).getPath());
+                    song.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+                    artist.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+                } catch (Exception e) {
+                    song.setText(songsList.get(pos).getName().toString());
+                    artist.setText("Unknown Artist");
+                }
                 onPlayPause();
                 break;
 
             case R.id.button_next:
-                Uri uri = Uri.parse(songsList.get(pos + 1).toString());
+                mediaPlayer.reset();
+                pos = (pos + 1) % songsList.size();
+                Uri uri = Uri.parse(songsList.get(pos).toString());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
+                try {
+
+                    mediaInfo.setDataSource(songsList.get(pos).getPath());
+                    song.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+                    artist.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+                } catch (Exception e) {
+                    song.setText(songsList.get(pos).getName().toString());
+                    artist.setText("Unknown Artist");
+                }
                 mediaPlayer.start();
                 break;
 
             case R.id.button_prev:
-                uri = Uri.parse(songsList.get(pos - 1).toString());
+                mediaPlayer.reset();
+                if(pos == 0)
+                    pos = songsList.size() - 1;
+                else
+                    pos -= 1;
+//                pos = (pos - 1) % songsList.size();
+                uri = Uri.parse(songsList.get(pos).toString());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
+                try {
+
+                    mediaInfo.setDataSource(songsList.get(pos).getPath());
+                    song.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+                    artist.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+                } catch (Exception e) {
+                    song.setText(songsList.get(pos).getName().toString());
+                    artist.setText("Unknown Artist");
+                }
                 mediaPlayer.start();
                 break;
         }

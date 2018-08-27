@@ -31,6 +31,9 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
     private  MediaPlayer mediaPlayer;
 
     int position;
+    int cur_pos;
+    Uri uri;
+    MediaPlayer.TrackInfo mediaInfo;
     //Handler to update UI timer & progress bar
     private ArrayList<File> songsList;
 
@@ -61,13 +64,14 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         songsList = (ArrayList) bundle.getParcelableArrayList("songList");
-        mediaPlayer = bundle.getParcelable("media");
         position = bundle.getInt("pos",0);
+        cur_pos = bundle.getInt("cur_pos");
 
-        Uri uri = Uri.parse(songsList.get(position).toString());
+        uri = Uri.parse(songsList.get(position).toString());
         mediaPlayer = MediaPlayer.create(getApplicationContext(),uri);
-        mediaPlayer.start();
-        if(mediaPlayer.isPlaying()) {
+        if(bundle.getBoolean("is_playing")) {
+            mediaPlayer.seekTo(cur_pos);
+            mediaPlayer.start();
             play_pause.setImageResource(R.drawable.ic_pause);
         } else {
             play_pause.setImageResource(R.drawable.ic_play);
@@ -95,6 +99,9 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
 
     }
 
+    /*
+    * The function sets the images of the play/pause button
+    * */
     public  void onPlayPause() {
         if(!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
@@ -111,6 +118,9 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
         super.onBackPressed();
     }
 
+    /*
+    * @param v(View)
+    * */
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -121,13 +131,21 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
                 break;
 
             case R.id.button_next:
-                Uri uri = Uri.parse(songsList.get(position + 1).toString());
+                mediaPlayer.reset();
+                position = (position + 1) % songsList.size();
+                Uri uri = Uri.parse(songsList.get(position).toString());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 mediaPlayer.start();
                 break;
 
             case R.id.button_prev:
-                uri = Uri.parse(songsList.get(position - 1).toString());
+                mediaPlayer.reset();
+                if(position == 0)
+                    position = songsList.size() - 1;
+                else
+                    position -= 1;
+//                pos = (pos - 1) % songsList.size();
+                uri = Uri.parse(songsList.get(position).toString());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 mediaPlayer.start();
                 break;

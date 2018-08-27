@@ -121,6 +121,7 @@
                 android:layout_weight="1"
                 android:background="@color/transparent"
                 app:srcCompat="@drawable/ic_previous"
+                android:onClick="onClick"
                 tools:ignore="VectorDrawableCompat" />
 
             <ImageButton
@@ -130,6 +131,7 @@
                 android:layout_weight="1"
                 android:background="@color/transparent"
                 android:src="@drawable/ic_play"
+                android:onClick="onClick"
                 tools:ignore="VectorDrawableCompat" />
 
             <ImageButton
@@ -139,6 +141,7 @@
                 android:layout_weight="1"
                 android:background="@color/transparent"
                 app:srcCompat="@drawable/ic_skip"
+                android:onClick="onClick"
                 tools:ignore="VectorDrawableCompat" />
         </LinearLayout>
 
