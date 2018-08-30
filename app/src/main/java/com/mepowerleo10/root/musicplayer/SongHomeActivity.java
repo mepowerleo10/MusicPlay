@@ -1,16 +1,21 @@
 package com.mepowerleo10.root.musicplayer;
 
 import android.content.Intent;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -20,6 +25,7 @@ import java.util.ArrayList;
 public class SongHomeActivity extends AppCompatActivity
 implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,View.OnClickListener {
 
+    //Buttons
     private ImageButton play_pause;
     private ImageButton nextButton;
     private ImageButton prevButton;
@@ -27,14 +33,13 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
     private TextView songTitleLabel;
     private TextView songCurrentDurationLabel;
     private TextView songTotalDurationLabel;
-    //Media player
-    private  MediaPlayer mediaPlayer;
+    public Handler handler;
 
+    //Media player
+    public static  MediaPlayer mediaPlayer;
     int position;
-    int cur_pos;
     Uri uri;
-    MediaPlayer.TrackInfo mediaInfo;
-    //Handler to update UI timer & progress bar
+    Bundle bundle;
     private ArrayList<File> songsList;
 
 
@@ -53,29 +58,52 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
         songCurrentDurationLabel = findViewById(R.id.textView_timeElapsed);
         songTotalDurationLabel = findViewById(R.id.textView_songLength);
 
+        bundle = getIntent().getExtras();
+        position = bundle.getInt("position");
+        songsList = (ArrayList) bundle.getParcelableArrayList("musicList");
+
         //MediaPlayer initialization
-        mediaPlayer = new MediaPlayer();
+        uri = Uri.parse(songsList.get(position).getPath());
+        mediaPlayer = MediaPlayer.create(this,uri);
+        play_pause.setImageResource(R.drawable.ic_pause);
+        mediaPlayer.start();
+
+        handler = new Handler();
 
         //Listeners
-        songProgressBar.setOnSeekBarChangeListener(this);
+        songProgressBar = findViewById(R.id.seekBar2);
+        songProgressBar.setMax(mediaPlayer.getDuration());
         mediaPlayer.setOnCompletionListener(this);
+        SongHomeActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(mediaPlayer != null){
+                    songProgressBar.setProgress(mediaPlayer.getCurrentPosition() / 1000);
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
 
-        //Getting & bundling together all of the extras bound from MainActivity.java
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        songsList = (ArrayList) bundle.getParcelableArrayList("songList");
-        position = bundle.getInt("pos",0);
-        cur_pos = bundle.getInt("cur_pos");
+        songProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(mediaPlayer != null && fromUser) {
+                    mediaPlayer.seekTo(progress * 1000);
+                }
+            }
 
-        uri = Uri.parse(songsList.get(position).toString());
-        mediaPlayer = MediaPlayer.create(getApplicationContext(),uri);
-        if(bundle.getBoolean("is_playing")) {
-            mediaPlayer.seekTo(cur_pos);
-            mediaPlayer.start();
-            play_pause.setImageResource(R.drawable.ic_pause);
-        } else {
-            play_pause.setImageResource(R.drawable.ic_play);
-        }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
     }
 
 
@@ -99,6 +127,7 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
 
     }
 
+
     /*
     * The function sets the images of the play/pause button
     * */
@@ -116,6 +145,13 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        Intent intent = new Intent();
+        intent.putExtra("position", position);
+        intent.putExtra("cur_position", mediaPlayer.getCurrentPosition());
+        mediaPlayer.release();
+        mediaPlayer = null;
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     /*
@@ -151,4 +187,5 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
                 break;
         }
     }
+
 }

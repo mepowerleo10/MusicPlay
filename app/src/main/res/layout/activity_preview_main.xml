@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/super_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:background="@drawable/bg_home1">
 
     <!--The playlist view of the songs-->
     <LinearLayout
@@ -20,22 +22,26 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
 
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/play_list"
             android:layout_width="355dp"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
+            android:scrollbars="vertical" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="67dp"
+        android:layout_height="51dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/play_pad"
         android:orientation="horizontal"
+        android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -48,27 +54,29 @@
             android:layout_width="202dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:onClick="onClickSong"
             android:orientation="vertical">
 
             <!--The song title-->
             <TextView
                 android:id="@+id/textView_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:clickable="true"
+                android:ellipsize="marquee"
+                android:gravity="center"
+                android:marqueeRepeatLimit="marquee_forever"
+
                 android:onClick="onClickSong"
+                android:padding="5dp"
+                android:scrollHorizontally="true"
+                android:scrollbars="horizontal"
+                android:singleLine="true"
                 android:text="Title"
                 android:textColor="@android:color/background_dark"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
 
             <!--The song artist-->
-            <TextView
-                android:id="@+id/textView_artist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="onClickSong"
-                android:text="Artist"
-                android:textColor="@android:color/background_dark" />
         </LinearLayout>
 
         <LinearLayout
