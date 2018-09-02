@@ -1,21 +1,17 @@
 package com.mepowerleo10.root.musicplayer;
 
 import android.content.Intent;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -29,11 +25,12 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
     private ImageButton play_pause;
     private ImageButton nextButton;
     private ImageButton prevButton;
-    private SeekBar songProgressBar;
+    private SeekBar seekBar;
     private TextView songTitleLabel;
     private TextView songCurrentDurationLabel;
     private TextView songTotalDurationLabel;
     public Handler handler;
+    public Runnable runnable;
 
     //Media player
     public static  MediaPlayer mediaPlayer;
@@ -53,7 +50,7 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
         play_pause = findViewById(R.id.button_play);
         nextButton = findViewById(R.id.button_next);
         prevButton = findViewById(R.id.button_prev);
-        songProgressBar = findViewById(R.id.seekBar2);
+        seekBar = findViewById(R.id.seekBar2);
         songTitleLabel = findViewById(R.id.textView_title);
         songCurrentDurationLabel = findViewById(R.id.textView_timeElapsed);
         songTotalDurationLabel = findViewById(R.id.textView_songLength);
@@ -71,37 +68,9 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
         handler = new Handler();
 
         //Listeners
-        songProgressBar = findViewById(R.id.seekBar2);
-        songProgressBar.setMax(mediaPlayer.getDuration());
+        seekBar = findViewById(R.id.seekBar2);
+        setSeekBar();
         mediaPlayer.setOnCompletionListener(this);
-        SongHomeActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if(mediaPlayer != null){
-                    songProgressBar.setProgress(mediaPlayer.getCurrentPosition() / 1000);
-                }
-                handler.postDelayed(this, 1000);
-            }
-        });
-
-        songProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(mediaPlayer != null && fromUser) {
-                    mediaPlayer.seekTo(progress * 1000);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
 
 
     }
@@ -128,6 +97,48 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
     }
 
 
+    public void setSeekBar() {
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                playCyle();
+            }
+        });
+        seekBar.setMax(mediaPlayer.getDuration());
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser)
+                    mediaPlayer.seekTo(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
+    public void playCyle() {
+        seekBar.setProgress(mediaPlayer.getCurrentPosition());
+
+        if(mediaPlayer.isPlaying()){
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    playCyle();
+                    mediaPlayer.start();
+                }
+            };
+            handler.postDelayed(runnable, 1000);
+        }
+    }
+
     /*
     * The function sets the images of the play/pause button
     * */
@@ -149,6 +160,7 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
         intent.putExtra("position", position);
         intent.putExtra("cur_position", mediaPlayer.getCurrentPosition());
         mediaPlayer.release();
+        handler.removeCallbacks(runnable);
         mediaPlayer = null;
         setResult(RESULT_OK, intent);
         finish();

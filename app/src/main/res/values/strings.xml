@@ -21,4 +21,65 @@
     <string name="nav_header_subtitle">myemail@musicplayer.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+        
+    <string name="text_login1">Login</string>
+        
+    <string name="text_register">Register</string>
+        
+    <string name="error_message_name">Enter Full Name</string>
+        
+    <string name="error_message_email">Enter Valid Email</string>
+        
+    <string name="error_message_age">Enter Age</string>
+        
+    <string name="error_message_password">Enter Password</string>
+        
+    <string name="success_message">Registration Successful</string>
+        
+    <string name="text_not_member">No account yet? Create one</string>
+        
+    <string name="text_already_member">Already a member? Login</string>
+        
+    <string name="error_email_exists">Email Already Exists</string>
+        
+    <string name="error_password_match">Password Does Not Matches</string>
+        
+    <string name="error_valid_email_password">Wrong Email or Password</string>
+    <string name="text_member">Already a member? Login</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="hell">ABOUT THE APPLICATION\n   The application is the perfect music player to all people at all ages who can listen to music :The main Objective of this app is to Entertain users by providing different capabilities to users like listening their favourite songs  free offline,ability to create own playlist of different songs and artists.\n\n</string>
+    <string name="listen">->CAPABILITY OF THE APP\n   The application gives the user a choice to Register in the application and so the users will be able to login into their account by username and password this gives them the capability to enjoy advanced features rather than just playing music by their android phones.The Registered user may listen,download or  buy tracks online also the App provide the cloud storage (offline storage of downloaded favourite music ) and so user can listen to music by any android phone when he or she login to his or her account there by save the phone memory space.\n</string>
+    <string name="music">Also our Music Player provides enjoyable smooth integration with facebook,instagram,twitter and youtube by facilitate sharing of tracks and getting Updates about new songs released\n</string>
+    <string name="favo">Enjoy\nyour\nfavourite\nsongs!</string>
+    <string name="song">Thank you for choosing our app,Your presence is our pleasure we appreciate!</string>
+    <string name="username">Enter_username</string>
+    <string name="passwor">Enter_password</string>
+    <string name="log_on">login</string>
+    <string name="signup">signup</string>
+    <string name="first">firstname</string>
+    <string name="second">middlename</string>
+    <string name="mid">Enter_firstname</string>
+    <string name="sec">Enter_middlename</string>
+    <string name="pass">Enter_password</string>
+    <string name="pas">password</string>
+    <string name="sur">surname</string>
+    <string name="surname">Enter_surname</string>
+    <string name="passd">password</string>
+    <string name="emai">email</string>
+    <string name="emi">eg:peter@gmail.com</string>
+    <string name="maya">Kenyan</string>
+    <string name="ta">Tanzanian</string>
+    <string name="ug">Ugandan</string>
+    <string name="gen">Gender</string>
+    <string name="nation">Nationality</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="submit">SUBMIT</string>
+    <string name="reh">setting</string>
+    <string name="exit">Exit</string>
+    <string name="pr">privacy</string>
 </resources>

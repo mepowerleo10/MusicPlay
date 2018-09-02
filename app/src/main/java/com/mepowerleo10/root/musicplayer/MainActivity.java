@@ -1,14 +1,12 @@
 package com.mepowerleo10.root.musicplayer;
 
 import android.content.Intent;
-import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +23,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -73,7 +69,9 @@ public class MainActivity extends AppCompatActivity
             musicList[i] = songsList.get(i).getName().replace(".mp3","");
         }
 
+
         uri = Uri.parse(songsList.get(position).getPath());
+        mediaPlayer = MediaPlayer.create(this, uri);
         /*super_layout = findViewById(R.id.super_layout);
         animationDrawable = (AnimationDrawable) super_layout.getBackground();
             animationDrawable.setEnterFadeDuration(4000);
@@ -108,6 +106,7 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("cur_positon", mediaPlayer.getCurrentPosition());
         mediaPlayer.release();
         mediaPlayer = null;
+
         startActivity(intent);
     }
 
@@ -192,6 +191,8 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if( id == R.id.login) {
+            startActivity(new Intent(this,LoginActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -228,13 +229,16 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putAll(this.bundle);
+        super.onSaveInstanceState(outState);
+    }
+
 
     /**
      * On the event of clicking the login button from the side menu
      * One should be taken to the settings activity
      */
-/*    public void onClickLogin(MenuItem item) {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-    }*/
+
 }
