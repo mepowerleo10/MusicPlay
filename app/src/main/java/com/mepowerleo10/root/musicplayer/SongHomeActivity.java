@@ -1,17 +1,26 @@
 package com.mepowerleo10.root.musicplayer;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +35,7 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
     private ImageButton nextButton;
     private ImageButton prevButton;
     private SeekBar seekBar;
-    private TextView songTitleLabel;
+    private TextView songTitleLabel, songArtistLabel;
     private TextView songCurrentDurationLabel;
     private TextView songTotalDurationLabel;
     public Handler handler;
@@ -36,9 +45,7 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
     public static  MediaPlayer mediaPlayer;
     int position;
     Uri uri;
-    Bundle bundle;
-    private ArrayList<File> songsList;
-
+    private ArrayList<Song> songsList;
 
 
     @Override
@@ -46,23 +53,27 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_home);
 
+
         //Player buttons initialization
         play_pause = findViewById(R.id.button_play);
         nextButton = findViewById(R.id.button_next);
         prevButton = findViewById(R.id.button_prev);
         seekBar = findViewById(R.id.seekBar2);
         songTitleLabel = findViewById(R.id.textView_title);
+        songArtistLabel = findViewById(R.id.textView_artist);
         songCurrentDurationLabel = findViewById(R.id.textView_timeElapsed);
         songTotalDurationLabel = findViewById(R.id.textView_songLength);
 
-        bundle = getIntent().getExtras();
-        position = bundle.getInt("position");
-        songsList = (ArrayList) bundle.getParcelableArrayList("musicList");
+        position = getIntent().getIntExtra("position", 0);
+        songsList = new SongManager(this, getContentResolver()).getList();
 
         //MediaPlayer initialization
         uri = Uri.parse(songsList.get(position).getPath());
-        mediaPlayer = MediaPlayer.create(this,uri);
+        mediaPlayer = MediaPlayer.create(this, uri);
         play_pause.setImageResource(R.drawable.ic_pause);
+        songArtistLabel.setText(songsList.get(position).getArtist());
+        songTitleLabel.setText(songsList.get(position).getTitle());
+        songTotalDurationLabel.setText(String.valueOf(songsList.get(position).getDuration() / 1000 * 60 * 60));
         mediaPlayer.start();
 
         handler = new Handler();
@@ -181,7 +192,10 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
             case R.id.button_next:
                 mediaPlayer.reset();
                 position = (position + 1) % songsList.size();
-                Uri uri = Uri.parse(songsList.get(position).toString());
+                songArtistLabel.setText(songsList.get(position).getArtist());
+                songTitleLabel.setText(songsList.get(position).getTitle());
+                songTotalDurationLabel.setText( String.valueOf(songsList.get(position).getDuration() / 1000 * 60 * 60));
+                uri = Uri.parse(songsList.get(position).getPath());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 mediaPlayer.start();
                 break;
@@ -193,7 +207,10 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
                 else
                     position -= 1;
 //                pos = (pos - 1) % songsList.size();
-                uri = Uri.parse(songsList.get(position).toString());
+                songArtistLabel.setText(songsList.get(position).getArtist());
+                songTitleLabel.setText(songsList.get(position).getTitle());
+                songTotalDurationLabel.setText(String.valueOf(songsList.get(position).getDuration() / 1000 * 60 * 60));
+                uri = Uri.parse(songsList.get(position).getPath());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 mediaPlayer.start();
                 break;

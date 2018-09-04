@@ -1,13 +1,21 @@
 package com.mepowerleo10.root.musicplayer;
 
+import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,28 +29,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
 
-    public ArrayList<File> songsList = new ArrayList<File>();
+    public ArrayList<Song>  songsList = new ArrayList<>();
 
 
     ImageButton play_pause;
-    String[] musicList;
     int position = 0;
-    MediaPlayer mediaPlayer;
+    public static MediaPlayer mediaPlayer;
     Uri uri;
     Intent intent;
-    Bundle bundle;
-    MediaMetadataRetriever mediaInfo;
-    TextView artist, song_label;
-    /*AnimationDrawable animationDrawable;
-    ConstraintLayout super_layout;*/
+    TextView song_label;
+ //   ContentResolver contentResolver = getContentResolver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,25 +65,23 @@ public class MainActivity extends AppCompatActivity
 
         song_label = findViewById(R.id.textView_title);
         play_pause = findViewById(R.id.button_play);
-        //fetch all song from the sdcard
-        SongManager manager = new SongManager();
-        songsList = manager.getList(Environment.getExternalStorageDirectory());
-        musicList = new String [songsList.size()];
-        for(int i = 0; i < songsList.size(); i++) {
 
-            //customize the songs for the playlist-view
-            musicList[i] = songsList.get(i).getName().replace(".mp3","");
+        //Initializing the music list
+        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        if(isStoragePermissionGranted()) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            if(cursor == null) {
+                Toast.makeText(this, "Query failed",Toast.LENGTH_LONG).show();
+            } else if(!cursor.moveToFirst()) {
+                Toast.makeText(this, "Found no media", Toast.LENGTH_LONG).show();
+            } else {
+                SongManager manager = new SongManager(this, getContentResolver());
+                songsList = manager.getList();
+            }
         }
 
 
-        uri = Uri.parse(songsList.get(position).getPath());
-        mediaPlayer = MediaPlayer.create(this, uri);
-        /*super_layout = findViewById(R.id.super_layout);
-        animationDrawable = (AnimationDrawable) super_layout.getBackground();
-            animationDrawable.setEnterFadeDuration(4000);
-            animationDrawable.setExitFadeDuration(4000);
-            animationDrawable.start();*/
-
+        //The navigation Drawer menu
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         playlist.setLayoutManager(layoutManager);
 
-        RecyclerView.Adapter adapter = new MyAdapter(this, this, songsList);
+        RecyclerView.Adapter adapter = new MyAdapter(this, this, songsList, getContentResolver());
         playlist.setAdapter(adapter);
 
         song_label.setSelected(true);
@@ -102,8 +106,7 @@ public class MainActivity extends AppCompatActivity
         //Bundling together all information from this context
         intent = new Intent(getApplicationContext(),SongHomeActivity.class);
         intent.putExtra("position", position);
-        intent.putExtra("musicList", songsList);
-        intent.putExtra("cur_positon", mediaPlayer.getCurrentPosition());
+        intent.putExtra("cur_position", mediaPlayer.getCurrentPosition());
         mediaPlayer.release();
         mediaPlayer = null;
 
@@ -111,20 +114,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     public  void onPlayPause() {
+
+        uri = Uri.parse(songsList.get(position).getPath());
         if(mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
+            mediaPlayer = MediaPlayer.create(this, uri);
+            song_label.setText(songsList.get(position).getTitle());
             mediaPlayer.start();
             play_pause.setImageResource(R.drawable.ic_pause);
         }
         if(!mediaPlayer.isPlaying()) {
+            song_label.setText(songsList.get(position).getTitle());
             mediaPlayer.start();
             play_pause.setImageResource(R.drawable.ic_pause);
         }
         else {
+            song_label.setText(songsList.get(position).getTitle());
             mediaPlayer.pause();
             play_pause.setImageResource(R.drawable.ic_play);
         }
-        song_label.setText(songsList.get(position).getName());
     }
 
     /*
@@ -142,9 +149,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.button_next:
                 mediaPlayer.reset();
                 position = (position + 1) % songsList.size();
-                Uri uri = Uri.parse(songsList.get(position).toString());
+                Uri uri = Uri.parse(songsList.get(position).getPath());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
-                song_label.setText(songsList.get(position).getName());
+                song_label.setText(songsList.get(position).getTitle());
                 mediaPlayer.start();
                 break;
 
@@ -154,9 +161,9 @@ public class MainActivity extends AppCompatActivity
                     position = songsList.size() - 1;
                 else
                     position -= 1;
-                uri = Uri.parse(songsList.get(position).toString());
+                uri = Uri.parse(songsList.get(position).getPath());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
-                song_label.setText(songsList.get(position).getName());
+                song_label.setText(songsList.get(position).getTitle());
                 mediaPlayer.start();
                 break;
         }
@@ -193,6 +200,8 @@ public class MainActivity extends AppCompatActivity
             return true;
         } else if( id == R.id.login) {
             startActivity(new Intent(this,LoginActivity.class));
+        } else if(id == R.id.about) {
+            startActivity(new Intent(this, AboutActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -216,29 +225,32 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d("onActivityResult ", "ResCode: "+resultCode +", ReqCode: "+requestCode);
-        if(requestCode == 619 && requestCode == 0) {
-            uri = Uri.parse(songsList.get(data.getIntExtra("position",0)).getPath());
-            Log.d("Main: ", "Received "+uri.toString());
-            mediaPlayer.create(this,uri);
-            mediaPlayer.seekTo(data.getIntExtra("cur_position",0));
-            mediaPlayer.start();
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putAll(this.bundle);
-        super.onSaveInstanceState(outState);
-    }
 
 
     /**
      * On the event of clicking the login button from the side menu
      * One should be taken to the settings activity
      */
+
+    public  boolean isStoragePermissionGranted() {
+        String TAG = "Permission";
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v(TAG,"Permission is granted");
+                return true;
+            } else {
+
+                Log.v(TAG,"Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG,"Permission is granted");
+            return true;
+        }
+    }
+
 
 }

@@ -1,40 +1,42 @@
 package com.mepowerleo10.root.musicplayer;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-import java.io.File;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
-    private ArrayList<File> list;
+    private ArrayList<Song> list;
     MediaMetadataRetriever mediaInfo;
     Context context;
     Activity activity;
+    ContentResolver contentResolver;
+    Cursor cursor, genCursor;
 
-    public MyAdapter(Context context, Activity activity, ArrayList<File> list) {
+    public MyAdapter(Context context, Activity activity, ArrayList<Song> list, ContentResolver contentResolver) {
         this.context = context;
         this.list = list;
         this.activity = activity;
+        this.contentResolver = contentResolver;
         if(this.activity != null)
             Log.d("MyAdapter: ", "Activity Received");
         else
@@ -73,29 +75,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        File file = list.get(position);
 
-        try {
-            mediaInfo.setDataSource(file.getPath());
-
-            holder.title.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
-            holder.artist.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
-            holder.genre.setText(mediaInfo.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE));
-        } catch (Exception e) {
-            holder.title.setText(file.getName().replace(".mp3",""));
-            holder.artist.setText("Unknown");
-            holder.genre.setText("Unknown Genre");
-        }
+        holder.title.setText(list.get(position).getTitle());
+        holder.artist.setText(list.get(position).getArtist());
+        //holder.genre.setText(list.get(position).getGenre());
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Log.d("RecyclerView:","Tapped on => "+list.get(position).getName());
                 Intent intent = new Intent(context, SongHomeActivity.class);
                 intent.putExtra("position", position);
-                intent.putExtra("musicList", list);
-                activity.startActivityForResult(intent,619);
+                activity.startActivity(intent);
             }
         });
 
