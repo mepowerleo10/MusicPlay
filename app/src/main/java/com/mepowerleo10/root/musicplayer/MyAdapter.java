@@ -86,7 +86,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             public void onClick(View v) {
                 Intent intent = new Intent(context, SongHomeActivity.class);
                 intent.putExtra("position", position);
-                activity.startActivity(intent);
+                activity.startActivityForResult(intent, 1);
             }
         });
 

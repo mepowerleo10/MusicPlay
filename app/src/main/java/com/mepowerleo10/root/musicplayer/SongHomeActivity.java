@@ -1,26 +1,17 @@
 package com.mepowerleo10.root.musicplayer;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Intent;
-import android.database.Cursor;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -209,7 +200,7 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
 //                pos = (pos - 1) % songsList.size();
                 songArtistLabel.setText(songsList.get(position).getArtist());
                 songTitleLabel.setText(songsList.get(position).getTitle());
-                songTotalDurationLabel.setText(String.valueOf(songsList.get(position).getDuration() / 1000 * 60 * 60));
+                songTotalDurationLabel.setText(String.valueOf(songsList.get(position).getDuration() / 1.667 * 0.000001));
                 uri = Uri.parse(songsList.get(position).getPath());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 mediaPlayer.start();
@@ -217,4 +208,12 @@ implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener,Vie
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

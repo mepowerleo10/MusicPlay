@@ -40,8 +40,11 @@ public class MainActivity extends AppCompatActivity
 
 
     public ArrayList<Song>  songsList = new ArrayList<>();
+    User user;
+    DataBaseHelper dataBaseHelper;
 
 
+    TextView nameField, emailField;
     ImageButton play_pause;
     int position = 0;
     public static MediaPlayer mediaPlayer;
@@ -65,6 +68,27 @@ public class MainActivity extends AppCompatActivity
 
         song_label = findViewById(R.id.textView_title);
         play_pause = findViewById(R.id.button_play);
+        dataBaseHelper = new DataBaseHelper(this);
+        nameField = findViewById(R.id.nameField);
+        emailField = findViewById(R.id.emailField);
+
+
+        Bundle bundle = getIntent().getExtras();
+        user = new User();
+        if(bundle != null) {
+            String email = bundle.getString("email");
+            user = dataBaseHelper.getUser(email);
+            Log.d("Email", email);
+            Log.d("User", user.getUname());
+            Log.d("User", user.getEmail());
+
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            View headerView = navigationView.getHeaderView(0);
+            nameField = headerView.findViewById(R.id.nameField);
+            emailField = headerView.findViewById(R.id.emailField);
+            nameField.setText("I am " + user.getUname());
+            emailField.setText(user.getEmail());
+        }
 
         //Initializing the music list
         uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -199,9 +223,15 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         } else if( id == R.id.login) {
+            /*if(mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+            }*/
             startActivity(new Intent(this,LoginActivity.class));
         } else if(id == R.id.about) {
             startActivity(new Intent(this, AboutActivity.class));
+        } else if(id == R.id.exit) {
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -215,6 +245,12 @@ public class MainActivity extends AppCompatActivity
 
 
         if (id == R.id.nav_share) {
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, "This is the best app for Music playback" +
+                    "\n https://play.google.com/store/apps/details?id=com.mepowerleo10.root.musicplayerhl=en");
+            sharingIntent.setPackage("com.whatsapp");
+            startActivity(sharingIntent);
 
         } else if (id == R.id.nav_send) {
 
@@ -251,6 +287,4 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
     }
-
-
 }

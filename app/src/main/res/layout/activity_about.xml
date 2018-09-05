@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/drawable_gradient_animation_list"
+    android:background="@drawable/bg_home1"
+    android:fitsSystemWindows="true"
     tools:context=".AboutActivity">
 
 
@@ -26,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/hell"
-                android:textColor="@android:color/holo_blue_dark"
+                android:textColor="@color/colorPrimaryDark"
                 tools:ignore="NewApi" />
 
             <TextView
@@ -34,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/listen"
-                android:textColor="@android:color/holo_blue_dark"
+                android:textColor="@color/colorPrimaryDark"
                 tools:ignore="NewApi" />
 
             <TextView
@@ -42,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/music"
-                android:textColor="@android:color/holo_blue_dark"
+                android:textColor="@color/colorPrimaryDark"
                 tools:ignore="NewApi" />
 
 
@@ -59,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/song"
-                android:textColor="@android:color/holo_blue_dark"
+                android:textColor="@color/colorPrimaryDark"
                 tools:ignore="NewApi" />
 
 
